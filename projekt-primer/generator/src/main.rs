@@ -14,8 +14,8 @@ use serde::{Deserialize, Serialize};
 
 const PORT: u16 = 12345;
 
-pub mod expression;
-pub mod sequence;
+// pub mod expression;
+// pub mod sequence;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Project {
@@ -167,47 +167,52 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         let (stream, _) = listener.accept().await?;
         let io = TokioIo::new(stream);
 
-        let service = service_fn(move |req| {
-            async move {
-                match (req.method(), req.uri().path()) {
-                    (&Method::GET, "/ping") => Ok::<_, Error>(Response::new(full(
-                        serde_json::to_string(&get_project()).unwrap(),
-                    ))),
-                    (&Method::GET, "/sequence") => {
-                        //
-                        let sequences = sequences();
-                        Ok(Response::new(full(
-                            serde_json::to_string(&sequences).unwrap(),
-                        )))
-                    }
-                    (&Method::POST, r) => {
-                        let seqs = sequences();
-                        let sequences = seqs
-                            // .iter()
-                            .find(|&x| ("/sequence/".to_string() + &x.name) == r);
-                        match sequences {
-                            None => create_404(),
-                            Some(s) if *s.name == "Arithmetic".to_string() => {
-                                let body = collect_body(req).await?;
-                                let request: SequenceRequest = serde_json::from_str(&body).unwrap();
-                                let range = request.range;
-                                let seq =
-                                    Arithmetic::new(request.parameters[0], request.parameters[1]);
-                                Ok(Response::new(full(
-                                    serde_json::to_string(&seq.range(range)).unwrap(),
-                                )))
-                            }
-                            _ => panic!("Not implemented"),
+        tokio::task::spawn(async move {
+            let service = service_fn(move |req| {
+                async move {
+                    match (req.method(), req.uri().path()) {
+                        (&Method::GET, "/ping") => Ok::<_, Error>(Response::new(full(
+                            serde_json::to_string(&get_project()).unwrap(),
+                        ))),
+                        (&Method::GET, "/sequence") => {
+                            //
+                            let sequences = sequences();
+                            Ok(Response::new(full(
+                                serde_json::to_string(&sequences).unwrap(),
+                            )))
                         }
-                    }
+                        (&Method::POST, r) => {
+                            let seqs = sequences();
+                            let sequences = seqs
+                                .iter()
+                                .find(|&x| ("/sequence/".to_string() + &x.name) == r);
+                            match sequences {
+                                None => create_404(),
+                                Some(s) if *s.name == "Arithmetic".to_string() => {
+                                    let body = collect_body(req).await?;
+                                    let request: SequenceRequest =
+                                        serde_json::from_str(&body).unwrap();
+                                    let range = request.range;
+                                    let seq = Arithmetic::new(
+                                        request.parameters[0],
+                                        request.parameters[1],
+                                    );
+                                    Ok(Response::new(full(
+                                        serde_json::to_string(&seq.range(range)).unwrap(),
+                                    )))
+                                }
+                                _ => panic!("Not implemented"),
+                            }
+                        }
 
-                    _ => create_404(),
+                        _ => create_404(),
+                    }
                 }
+            });
+
+            if let Err(err) = http1::Builder::new().serve_connection(io, service).await {
+                println!("Error serving connection: {:?}", err);
             }
         });
-
-        if let Err(err) = http1::Builder::new().serve_connection(io, service).await {
-            println!("Error serving connection: {:?}", err);
-        }
     }
 }
