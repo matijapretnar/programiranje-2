@@ -3,7 +3,7 @@
 //  apply_int: (int -> int) -> int -> int
 //  apply: ('a -> 'b) -> 'a -> 'b
 //  apply2: ('a -> 'a -> 'b) -> 'a -> 'a -> 'b
-//  map: ('a -> 'b) -> 'a list -> 'b list  (Uporabite Vec<T> namesto list, predpostavite, da funkcija ne spremeni elementov seznama)
+//  map: ('a -> 'b) -> 'a list -> 'b list  (Uporabite Vec<T> namesto list, predpostavite, funkcijo narediti najbolj splošno)
 //  ponavljaj: int -> ('a -> 'a) -> 'a -> 'a // Ponovi funkcijo n-krat
 //  filter: ('a -> bool) -> 'a list -> 'a list // Vrne seznam elementov, ki zadoščajo pogoju - uporabite Vec<T> namesto list in že vgrajeno funkcijo filter
 
@@ -17,12 +17,10 @@
 // nizov in vrne vsoto njihovih dolžin
 // vektor parov (i32, i32) in vrne vsoto njihovih pozitivnih produktov
 // dva vektorja <i32> in vrne vektor, ki vsebuje vsote parov
-// dva vektorja <i32> in vrne vsoto poparjenih pozitivni produktov s pomočjo ene izmed prejšnjih nalog
+// dva vektorja <i32> in vrne vsoto poparjenih pozitivni produktov
 // vektor Option<T> in izpiše vse T-je
 // vektor Option<T> in vrne število Some-ov
-// odfiltrira števila deljena s 3
-
-// Popravite zaporedja iz prejšnjih vaj, da bodo `iterabilna`
+// odfiltrira števila deljiva s 3
 
 // Dopolnite spodnjo funkcijo, da vrne niz, kjer so vse prve črke posameznih besed velike
 // ["Just,", " ", "hello", " ", "world", "!"] -> "Just, Hello World", "!"
@@ -82,3 +80,5 @@ fn test_degenerate_cases() {
 
 
 */
+
+fn main() {}
