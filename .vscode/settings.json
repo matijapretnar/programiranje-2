@@ -8,6 +8,6 @@
         "04-polimorfizem/predavanja/znacilnosti/Cargo.toml",
         "04-polimorfizem/predavanja/zivljenjskedobe/Cargo.toml",
         "05-funkcijsko-programiranje/predavanja/Cargo.toml",
-        // "minirust/Cargo.toml",
+        // "05-funkcijsko-programiranje/vaje/Cargo.toml",
     ]
 }
