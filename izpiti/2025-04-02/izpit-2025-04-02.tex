@@ -1,0 +1,216 @@
+\documentclass[11pt]{../izpit}
+\usepackage{fouriernc}
+\usepackage{xcolor}
+\usepackage[outputdir=../]{minted}
+\usemintedstyle{xcode}
+\begin{document}
+
+\izpit[ucilnica=P01, naloge=-1]{Programiranje 2: 1. pisni izpit}{2.\ april 2025}{
+  Čas reševanja je 60 minut.
+  Veliko uspeha!
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\naloga[\tocke{10}]
+
+Za vsakega izmed spodnjih programov prikažite vse spremembe sklada in kopice, če poženemo funkcijo \mintinline{rust}{main}. Za vsako spremembo označite, po kateri vrstici v kodi se zgodi.
+
+\podnaloga
+\begin{minted}[linenos]{rust}
+fn main() {
+    let mut vec = vec![1, 2, 3];
+    for i in &vec {
+        println!("{}", i);
+    }
+    vec.push(4);
+}
+\end{minted}
+
+\podnaloga
+\begin{minted}[linenos]{rust}
+fn f(c: usize) -> usize {
+    println!("{c}");
+    c * 10
+}
+
+fn main() {
+    let x = String::from("Hello");
+    let n = f(x.len());
+    let y = x;
+    println!("{} {}", y, n);
+}
+\end{minted}
+
+\podnaloga
+\begin{minted}[linenos]{rust}
+fn f(x: usize, s: String) -> usize {
+    let y = x + s.len();
+    g(y)
+}
+
+fn g(z: usize) -> usize {
+    z * 2
+}
+
+fn main() {
+    let s = String::from("Hello");
+    let result = f(5, s);
+    println!("{}", result);
+}
+\end{minted}
+
+\podnaloga
+\begin{minted}[linenos]{rust}
+fn f(s: &String) {
+    let c = s.clone();
+    println!("Copy: {}", c);
+}
+
+fn g(mut s: String) -> String {
+    s.push_str(" World");
+    f(&s);
+    s
+}
+
+fn h() -> String {
+    let wrapped = String::from("Hello");
+    g(wrapped)
+}
+
+fn main() {
+    let result = h();
+    println!("Final String: {}", result);
+}
+
+\end{minted}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\naloga[\tocke{20}]
+
+Definirajmo tip \mintinline{rust}{Ali<T, U>}, kot najbolj enostaven vsotni tip. Dopolnite signaturo spodnje implementacije pri čemer naj bodo tipi čim bolj splošni (morebitne odločitve utemeljite). Če v dani prostor ni treba dopisati ničesar, ga prečrtajte.
+
+{\large
+\begin{minted}{rust}
+enum Ali<T, U> {
+    Levi(T),
+    Desni(U),
+}
+
+impl<T, U> Ali<T, U> {
+    fn je_levi(_____ self) -> _____ bool {
+        // Preveri, ali smo v varianti `levo`
+    }
+
+    fn zamenjaj(_____ self) -> _____ Ali<_____, _____> {
+        // Zamenja varianti.
+    }
+
+    // Ena od teh, obe sta ok
+    fn dobi_desnega(_____ self) -> _____ Option<__________> {
+        // Vrne vrednost v desni varianti (če je to mogoče).
+    }
+
+    fn map_levi<F, V>(_____ self, f: _____ F) -> __________
+      where
+        F: __________,
+    {
+        // Levo vrednost preslika s funkcijo `f`
+    }
+    
+    fn zamenjaj_levega(_____ self, t: _____ T) {
+        // Na mestu zamenja levo varianto
+    }
+
+    fn uporabi<F, G, V, Z>(self, f: F, g: G) -> _____ Ali<V, Z>
+      where
+        F: __________ -> _____ Ali<V, Z>,
+        G: __________ -> _____ Ali<V, Z>,
+    {
+        // Uporabi ustrezno funkcijo na ustrezni varianti
+        // let a: Ali<usize, usize> = Ali::Desni(5);
+        // let f1 = |x| Ali::Levi(x + 1);
+        // let f2 = |x| Ali::Desni(vec![0;x]);
+        // let k = a.uporabi(f1, f2);
+        // println!("{:?}", k.dobi_desnega()); // Some([0,0,0,0])
+    }
+}
+\end{minted}
+}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\naloga[\tocke{20}]
+Za vsakega izmed spodnjih programov:
+\begin{enumerate}
+  \item razložite, zakaj in s kakšnim namenom Rust program zavrne;
+  \item program popravite tako, da bo veljaven in bo učinkovito dosegel prvotni namen.
+\end{enumerate}
+
+\podnaloga
+\begin{minted}{rust}
+fn print_length(s: String) {
+    println!("Length: {}", s.len());
+}
+fn main() {
+    let text = String::from("Rust");
+    print_length(text);
+    println!("{}", text);
+}
+\end{minted}
+
+\podnaloga
+\begin{minted}{rust}
+fn main() {
+    let mut data = vec![1, 2, 3];
+    let first = &data[0];
+    data.push(4);
+    println!("{}", first);
+}
+\end{minted}
+
+\podnaloga
+\begin{minted}{rust}
+fn main() {
+    let s = String::from("hello");
+    let r = &s;
+    let t = s;
+    println!("{}", r);
+}
+\end{minted}
+
+\podnaloga
+\begin{minted}{rust}
+fn f() -> &String {
+    let s = String::from("hello");
+    &s
+}
+
+fn main() {
+    let r = f();
+    println!("{}", r);
+}
+\end{minted}
+
+\podnaloga
+\begin{minted}{rust}
+struct O { x: Vec<i32>, }
+impl O {
+    fn a(&self) -> &i32 { &self.x[0] }
+    fn b(self) -> Vec<i32> { self.x }
+}
+// Cilj je izpisati vsebino vektorja in prvi element kar se da učinkovito.
+// Smiselen popravek je lahko tudi v definiciji ali implementaciji strukture O.
+fn main() {
+    let o = O { x: vec![1, 2, 3] };
+    let first = o.a();
+    println!("{:?}", o.b());
+    println!("{}", first);
+}
+\end{minted}
+
+
+\end{document}
