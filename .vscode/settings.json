@@ -9,5 +9,7 @@
         "04-polimorfizem/predavanja/zivljenjskedobe/Cargo.toml",
         "05-funkcijsko-programiranje/predavanja/Cargo.toml",
         // "05-funkcijsko-programiranje/vaje/Cargo.toml",
+        "08-pametni-kazalci/predavanja/Cargo.toml",
+        "09-vecnitno-izvajanje/predavanja/Cargo.toml",
     ]
 }
