@@ -32,10 +32,6 @@ Napišite program, ki izračuna prvih N praštevil (N nastavljeno v pomnilniku a
 
 Napišite program, ki v pomnilniku obrne seznam dolžine N (podan z `DB`) z uporabo dveh kazalcev — začetek in konec.
 
-7. Rekurzivni fibonacci (izziv)
-
-Implementirajte rekurzivno `fib(n)` z ustrezno uporabo sklada in `CALL`/`RET`. Opozorilo: simulator ima omejen pomnilnik, uporabljajte majhna n.
-
-8. Sito Eratostenovo (izziv)
+7. Sito Eratostenovo (izziv)
 
 Implementirajte sito do M in potisnite praštevila na sklad ali jih zapišite v pomnilnik.
