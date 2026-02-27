@@ -18,7 +18,7 @@ Napišite funkcijo `poisci_minimum`, ki kot parametra uporablja registre: `A` na
 
 3. Menjava pomnilniških celic s kazalniki
 
-Napišite podprogram `swap_mem`, ki sprejme dva naslova v registrih `A` in `B` in zamenja vsebini pomnilniških mest `[A]` in `[B]`.
+Napišite podprogram `zamenjaj_v_spominu`, ki sprejme dva naslova v registrih `A` in `B` in zamenja vsebini pomnilniških mest `[A]` in `[B]`.
 
 4. Sortiranje — funkcija `uredi`
 
