@@ -68,15 +68,6 @@ fn ordered(arr: &[u32]) -> bool {
     panic!("Not implemented");
 }
 
-fn vsebuje<T : PartialEq>(v: &Vec<T>, x : &T) -> bool {
-    for y in v {
-      if x == y {
-        return true
-      }
-    }
-    return false
-}
-
 /// ------------------------------------------------------------------------------------------------
 /// Hitro potenciranje
 /// Napišite funkcijo `fn pow(mut x: u32, mut n: u32) -> u32`, ki izračuna `x` na potenco `n` v času O(log n)
@@ -108,25 +99,10 @@ fn pyramid(n: u32) {
 
 /// ------------------------------------------------------------------------------------------------
 /// Napišite program, ki izpiše piramido črk angleške abecede višine `n`, lahkom predpostavite, da bo n največ 26.
-///      A
-///    A B A
+///       A
+///     A B A
 ///   A B C B A
 /// A B C D C B A
 /// Napišite funkcijo `fn selection_sort(mut arr: [u32])`, ki uredi tabelo `arr` z uporabo algoritma urejanja z izbiranjem
 
 fn main() {}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn it_works() {
-        let result = main();
-        assert_eq!(result, ());
-    }
-
-    #[test]
-    fn test_fib() {
-    }
-}
