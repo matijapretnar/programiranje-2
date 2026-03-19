@@ -1,6 +1,6 @@
 # Strukture
 
-S pomočjo ukaza `cargo` začnite nov projekt po imenu `structs`.
+S pomočjo ukaza `cargo` začnite nov projekt po imenu `vaje`.
 
 ## Osnovne strukture
 
@@ -44,26 +44,25 @@ enum Izraz {
 }
 ```
 1. Poskusite napisati tip za `Izraz` brez uporabe `Box` in skupaj s prevajalnikom razmislite, zakaj to ne deluje.
-1. Razmislite, ali je potrebno v zapis izraza dodati tudi oklepaje, ali je dovolj že to, da drevo pravilno predstavlja izraz.
-1. Zapišite primer izrazov za:
-    - `1 + (2 * 3)`
-    - `(1 + 2) * 3`
-    - `1 + 2 + 3`
-    - `5**2 + 3**2`
-    - `5 * 5 + 4**2`
-1. Implementirajte metodo `eval`, ki izračuna vrednost izraza.
-1. Implementirajte metodo `collect`, ki vrne število konstant v izrazu.
-1. Implementirajte za izpisovanje `izpis`, ki vrne izraz v obliki `(a + b) * c`.
+2. Razmislite, ali je potrebno v zapis izraza dodati tudi oklepaje, ali je dovolj že to, da drevo pravilno predstavlja izraz.
+3. Zapišite primer izrazov za:
+   - `1 + (2 * 3)`
+   - `(1 + 2) * 3`
+   - `1 + 2 + 3`
+   - `5**2 + 3**2`
+   - `5 * 5 + 4**2`
+4. Implementirajte metodo `eval`, ki izračuna vrednost izraza.
+5. Implementirajte metodo `collect`, ki vrne število konstant v izrazu.
+6. Implementirajte za izpisovanje `izpis`, ki vrne izraz v obliki `(a + b) * c`.
 Poskrbite, da boste pravilno izpisali oklepaje, vendar se ne obremenjujte, če izpište kakšen dodaten oklepaj.
-1. Napišite nekaj primernih testov za metode `eval`, `collect` in `izpis`.
-
+7. Napišite nekaj primernih testov za metode `eval`, `collect` in `izpis`.
 
 <!-- ## Razširitve AST
 
-1. AST dopolnite z unarno opracijo `UnMinus`, ki predstavlja `-x` za nek izraz `x`.
-1. Dodajte še binarne operacije
+8. AST dopolnite z unarno opracijo `UnMinus`, ki predstavlja `-x` za nek izraz `x`.
+9. Dodajte še binarne operacije
     - `Pow`, ki predstavlja potenciranje.
     - `Mod`, ki predstavlja ostanek pri deljenju.
-3. Ternarno operacijo `PowMod`, ki predstavlja `a**b % c`.
+10. Ternarno operacijo `PowMod`, ki predstavlja `a**b % c`.
 
 ## Razširitve zaporedij -->
