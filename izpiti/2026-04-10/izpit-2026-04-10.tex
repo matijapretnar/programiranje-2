@@ -1,0 +1,189 @@
+\documentclass[11pt]{../izpit}
+\usepackage{fouriernc}
+\usepackage{xcolor}
+\usepackage{minted}
+\usemintedstyle{xcode}
+\begin{document}
+
+\izpit[naloge=-1]{Programiranje 2: pisni izpit}{10.\ april 2026}{Čas reševanja je 60 minut. Veliko uspeha!}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\naloga[\tocke{10}]
+Za vsakega izmed spodnjih programov prikažite vse spremembe sklada in kopice, če poženemo funkcijo \mintinline{rust}{main}. Za vsako spremembo označite, po kateri vrstici v kodi se zgodi.
+
+\podnaloga
+\begin{minted}[linenos]{rust}
+fn main() {
+    let x = 3;
+    let y = 5;
+    let (s, p) = (x + y, x);
+    println!("{} {}", s, p);
+}
+\end{minted}
+
+\podnaloga
+\begin{minted}[linenos]{rust}
+fn f(s: &String) -> usize {
+    s.len() + 1
+}
+
+fn main() {
+    let a = String::from("Rust");
+    let b = f(&a);
+    let c = a;
+    println!("{} {}", c, b);
+}
+\end{minted}
+
+\podnaloga
+\begin{minted}[linenos]{rust}
+fn pripni(mut s: String, c: char) -> String {
+    s.push(c);
+    s
+}
+
+fn main() {
+    let a = String::from("AB");
+    let b = pripni(a, 'C');
+    let c = pripni(b, 'D');
+    println!("{}", c);
+}
+\end{minted}
+\podnaloga
+\begin{minted}[linenos]{rust}
+fn f(s: &String) -> String {
+    let mut kopija = s.clone();
+    kopija.push_str("!!");
+    kopija
+}
+
+fn main() {
+    let a = String::from("Pozdrav");
+    let b = f(&a);
+    println!("{} {}", a, b);
+}
+\end{minted}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\naloga[\tocke{20}]
+
+Definirajmo tip izmeničnega seznama \mintinline{rust}{Izmenicni<T, U>}, ki hrani elemente izmenično po tipih: $T, U, T, U, \ldots$ Dopolnite signaturo spodnje implementacije pri čemer naj bodo tipi čim bolj splošni (morebitne odločitve utemeljite). Če v dani prostor ni treba dopisati ničesar, ga prečrtajte.
+
+{\large
+\begin{minted}{rust}
+enum Izmenicni<T, U> {
+    Prazen,
+    Sestavljen(T, Box<Izmenicni<U, T>>),
+}
+
+impl<T, U> Izmenicni<T, U> {
+    fn dolzina(_____ self) -> _____ usize {
+        // Vrne dolžino seznama
+    }
+
+    fn glava(_____ self) -> _____ Option<_____ T> {
+        // Vrne referenco na prvi element (če obstaja)
+    }
+
+    fn rep(_____ self) -> _____ Izmenicni<_____, _____> {
+        // Vrne rep seznama (brez prvega elementa).
+        // Porabi originalni seznam.
+    }
+
+    fn dodaj(_____ self, x: _____ U) -> _____ Izmenicni<_____, _____> {
+        // Na začetek doda element tipa U in vrne nov seznam.
+        // Porabi originalni seznam.
+    }
+
+    fn zamenjaj_glavo(_____ self, x: _____ T) {
+        // Na mestu zamenja vrednost prvega elementa (če obstaja)
+    }
+
+    fn zdruzi_in_sestej(_____ self,
+        other: _____ Izmenicni<_____, _____>)
+        -> _____ Izmenicni<_____, _____>
+      where
+        T: __________,
+        U: __________,
+    {
+        // Za vsak par ustreznih elementov vrne
+        // ((prvi, drugi), prvi + drugi)
+        // s1: 1, "a", 3, "b"
+        // s2: 4, "p", 9, "l"
+        // s1.zdruzi_in_sestej(s2):
+        //   ((1,4), 5), (("a","p"), "ap"),
+        //   ((3,9), 12), (("b","l"), "bl")
+    }
+}
+\end{minted}
+}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\naloga[\tocke{20}]
+Za vsakega izmed spodnjih programov:
+\begin{enumerate}
+  \item razložite, zakaj in s kakšnim namenom Rust program zavrne;
+  \item program popravite tako, da bo veljaven in bo učinkovito dosegel prvotni namen.
+\end{enumerate}
+
+\podnaloga
+\begin{minted}{rust}
+fn main() {
+    let besede = vec![String::from("jabolko"), String::from("hruška")];
+    let prva = besede[0];
+    println!("Prva beseda: {}", prva);
+}
+\end{minted}
+
+\podnaloga
+\begin{minted}{rust}
+struct Izpisek {
+    besedilo: &str,
+}
+fn main() {
+    let s = String::from("Pozdravljen svet");
+    let i = Izpisek { besedilo: &s };
+    println!("{}", i.besedilo);
+}
+\end{minted}
+
+\podnaloga
+\begin{minted}{rust}
+fn main() {
+    let mut v = vec![1, 2, 3];
+    let prvi = &v[0];
+    v.push(4);
+    println!("Prvi element: {}", prvi);
+}
+\end{minted}
+
+\podnaloga
+\begin{minted}{rust}
+fn podvoji(v: &Vec<String>) -> Vec<String> {
+    let mut rezultat = Vec::new();
+    for s in v {
+        rezultat.push(*s);
+    }
+    rezultat
+}
+\end{minted}
+
+\podnaloga
+\begin{minted}{rust}
+fn prvi_znak(s: &str) -> &str {
+    let rezultat = String::from(&s[..1]);
+    &rezultat
+}
+fn main() {
+    let s = String::from("Rust");
+    println!("{}", prvi_znak(&s));
+}
+\end{minted}
+
+
+\end{document}

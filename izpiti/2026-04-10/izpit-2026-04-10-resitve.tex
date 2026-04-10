@@ -1,0 +1,369 @@
+\documentclass[arhiv]{../izpit}
+\usepackage{fouriernc}
+\usepackage{xcolor}
+\usepackage{minted}
+\usemintedstyle{xcode}
+\begin{document}
+
+\izpit{Programiranje 2: 1. pisni izpit -- rešitve}{10.\ april 2026}{
+  Čas reševanja je 60 minut.
+  Veliko uspeha!
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\naloga[\tocke{10}]
+
+Za vsakega izmed spodnjih programov prikažite vse spremembe sklada in kopice, če poženemo funkcijo \mintinline{rust}{main}. Za vsako spremembo označite, po kateri vrstici v kodi se zgodi.
+
+\podnaloga
+\begin{minted}[linenos]{rust}
+fn main() {
+    let x = 3;
+    let y = 5;
+    let (s, p) = (x + y, x);
+    println!("{} {}", s, p);
+}
+\end{minted}
+
+\noindent
+\emph{Rešitev:}
+\begin{itemize}
+  \item Vrstica 2: na sklad se doda okvir za \mintinline{rust}{main}, v njem \mintinline{rust}{x = 3}.
+  \item Vrstica 3: na sklad se doda \mintinline{rust}{y = 5}.
+  \item Vrstica 4: izračuna se par \mintinline{rust}{(3 + 5, 3) = (8, 3)}, na sklad se zapišeta \mintinline{rust}{s = 8}, \mintinline{rust}{p = 3}.
+  \item Vrstica 5: izpiše se \texttt{8 3}, okvir za \mintinline{rust}{main} se odstrani s sklada.
+\end{itemize}
+
+\podnaloga
+\begin{minted}[linenos]{rust}
+fn f(s: &String) -> usize {
+    s.len() + 1
+}
+
+fn main() {
+    let a = String::from("Rust");
+    let b = f(&a);
+    let c = a;
+    println!("{} {}", c, b);
+}
+\end{minted}
+
+\noindent
+\emph{Rešitev:}
+\begin{itemize}
+  \item Vrstica 6: na sklad se doda okvir za \mintinline{rust}{main}. Na kopici se ustvari niz \texttt{"Rust"}, na skladu \mintinline{rust}{a} kaže na ta niz (kazalec, dolžina 4, kapaciteta 4).
+  \item Vrstica 7: pokliče se \mintinline{rust}{f}, na sklad se doda okvir za \mintinline{rust}{f} z referenco \mintinline{rust}{s}, ki kaže na \mintinline{rust}{a}.
+  \item Vrstica 2: izračuna se \mintinline{rust}{4 + 1 = 5}.
+  \item Vrstica 7: okvir za \mintinline{rust}{f} se odstrani, na sklad se zapiše \mintinline{rust}{b = 5}.
+  \item Vrstica 8: lastništvo niza na kopici se premakne iz \mintinline{rust}{a} na \mintinline{rust}{c} (na skladu se doda \mintinline{rust}{c}, ki kaže na isti niz). Spremenljivka \mintinline{rust}{a} ni več veljavna.
+  \item Vrstica 9: izpiše se \texttt{Rust 5}. Ob koncu funkcije se \mintinline{rust}{c} sprosti, niz se dealocira s kopice.
+\end{itemize}
+
+\podnaloga
+\begin{minted}[linenos]{rust}
+fn pripni(mut s: String, c: char) -> String {
+    s.push(c);
+    s
+}
+
+fn main() {
+    let a = String::from("AB");
+    let b = pripni(a, 'C');
+    let c = pripni(b, 'D');
+    println!("{}", c);
+}
+\end{minted}
+
+\noindent
+\emph{Rešitev:}
+\begin{itemize}
+  \item Vrstica 7: okvir za \mintinline{rust}{main}. Na kopici se ustvari niz \texttt{"AB"}, \mintinline{rust}{a} kaže nanj.
+  \item Vrstica 8: pokliče se \mintinline{rust}{pripni}. Lastništvo niza se premakne iz \mintinline{rust}{a} v \mintinline{rust}{s}. Na sklad se doda okvir za \mintinline{rust}{pripni} s \mintinline{rust}{s} (kaže na kopico) in \mintinline{rust}{c = 'C'}.
+  \item Vrstica 2: nizu na kopici se doda \texttt{'C'}, zdaj je \texttt{"ABC"} (morebitna realokacija).
+  \item Vrstica 3: vrne se niz.
+  \item Vrstica 8: okvir za \mintinline{rust}{pripni} se odstrani, lastništvo se prenese na \mintinline{rust}{b}.
+  \item Vrstica 9: pokliče se \mintinline{rust}{pripni} z \mintinline{rust}{b}. Lastništvo se premakne iz \mintinline{rust}{b} v \mintinline{rust}{s}.
+  \item Vrstica 2: nizu se doda \texttt{'D'}, zdaj je \texttt{"ABCD"}.
+  \item Vrstica 9: okvir za \mintinline{rust}{pripni} se odstrani, lastništvo se prenese na \mintinline{rust}{c}.
+  \item Vrstica 10: izpiše se \texttt{ABCD}. Ob koncu se niz dealocira.
+\end{itemize}
+
+\podnaloga
+\begin{minted}[linenos]{rust}
+fn f(s: &String) -> String {
+    let mut kopija = s.clone();
+    kopija.push_str("!!");
+    kopija
+}
+
+fn main() {
+    let a = String::from("Pozdrav");
+    let b = f(&a);
+    println!("{} {}", a, b);
+}
+\end{minted}
+
+\noindent
+\emph{Rešitev:}
+\begin{itemize}
+  \item Vrstica 8: okvir za \mintinline{rust}{main}. Na kopici se ustvari niz \texttt{"Pozdrav"}, \mintinline{rust}{a} kaže nanj.
+  \item Vrstica 9: pokliče se \mintinline{rust}{f}. Na sklad se doda okvir za \mintinline{rust}{f} z referenco \mintinline{rust}{s}, ki kaže na \mintinline{rust}{a}.
+  \item Vrstica 2: na kopici se ustvari kopija niza \texttt{"Pozdrav"}, \mintinline{rust}{kopija} kaže na novo kopijo.
+  \item Vrstica 3: kopiji se doda \texttt{"!!"}, zdaj je \texttt{"Pozdrav!!"} (morebitna realokacija).
+  \item Vrstica 4: vrne se lastništvo \mintinline{rust}{kopija}.
+  \item Vrstica 9: okvir za \mintinline{rust}{f} se odstrani. Lastništvo kopije se prenese na \mintinline{rust}{b}. Na kopici sta zdaj dva niza: \texttt{"Pozdrav"} (last. \mintinline{rust}{a}) in \texttt{"Pozdrav!!"} (last. \mintinline{rust}{b}).
+  \item Vrstica 10: izpiše se \texttt{Pozdrav Pozdrav!!}. Ob koncu se oba niza dealocirata.
+\end{itemize}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\naloga[\tocke{20}]
+
+Definirajmo tip izmeničnega seznama \mintinline{rust}{Izmenicni<T, U>}, ki hrani elemente izmenično po tipih: $T, U, T, U, \ldots$ Dopolnite signaturo spodnje implementacije pri čemer naj bodo tipi čim bolj splošni (morebitne odločitve utemeljite). Če v dani prostor ni treba dopisati ničesar, ga prečrtajte.
+
+{\large
+\begin{minted}{rust}
+enum Izmenicni<T, U> {
+    Prazen,
+    Sestavljen(T, Box<Izmenicni<U, T>>),
+}
+\end{minted}
+}
+
+\noindent
+Ključni vpogled: varianta \mintinline{rust}{Sestavljen} v repu zamenja vlogi tipov \mintinline{rust}{T} in \mintinline{rust}{U}. Rep seznama tipa \mintinline{rust}{Izmenicni<T, U>} je tipa \mintinline{rust}{Izmenicni<U, T>}.
+
+\podnaloga
+\mintinline{rust}{fn dolzina(_____ self) -> _____ usize}
+
+\noindent
+\emph{Rešitev:} \mintinline{rust}{fn dolzina(&self) -> usize}. Za izračun dolžine ne potrebujemo lastništva, dovolj je nespremenljiva referenca.
+
+\podnaloga
+\mintinline{rust}{fn glava(_____ self) -> _____ Option<_____ T>}
+
+\noindent
+\emph{Rešitev:} \mintinline{rust}{fn glava(&self) -> Option<&T>}. Vrnemo referenco na prvi element, ne porabimo seznama. Vračamo \mintinline{rust}{Option}, ker je seznam lahko prazen.
+
+\podnaloga
+\mintinline{rust}{fn rep(_____ self) -> _____ Izmenicni<_____, _____>}
+
+\noindent
+\emph{Rešitev:} \mintinline{rust}{fn rep(self) -> Izmenicni<U, T>}. Porabi originalni seznam in vrne rep. Ključno: ker \mintinline{rust}{Sestavljen(T, Box<Izmenicni<U, T>>)} v repu zamenja tipna parametra, je vrnjen tip \mintinline{rust}{Izmenicni<U, T>} (ne \mintinline{rust}{Izmenicni<T, U>}).
+
+\podnaloga
+\mintinline{rust}{fn dodaj(_____ self, x: _____ U) -> _____ Izmenicni<_____, _____>}
+
+\noindent
+\emph{Rešitev:} \mintinline{rust}{fn dodaj(self, x: U) -> Izmenicni<U, T>}. Na začetek dodamo element tipa \mintinline{rust}{U}, originalni seznam postane rep. Ker rep zamenja tipna parametra, je rezultat \mintinline{rust}{Izmenicni::Sestavljen(x, Box::new(self))}, tipa \mintinline{rust}{Izmenicni<U, T>}.
+
+\podnaloga
+\mintinline{rust}{fn zamenjaj_glavo(_____ self, x: _____ T)}
+
+\noindent
+\emph{Rešitev:} \mintinline{rust}{fn zamenjaj_glavo(&mut self, x: T)}. Na mestu spremenimo vrednost prvega elementa, zato potrebujemo spremenljivo referenco \mintinline{rust}{&mut self}. Element \mintinline{rust}{x} prevzamemo v last (zamenja obstoječega).
+
+\podnaloga
+
+\mintinline{rust}{fn zdruzi_in_sestej(_____ self,}
+
+\mintinline{rust}{    other: _____ Izmenicni<_____, _____>)}
+
+\mintinline{rust}{    -> _____ Izmenicni<_____, _____>}
+
+\mintinline{rust}{  where T: __________, U: __________}
+
+\noindent
+\emph{Rešitev:}
+
+\mintinline{rust}{fn zdruzi_in_sestej(&self, other: &Izmenicni<T, U>)}
+
+\mintinline{rust}{    -> Izmenicni<((T, T), T), ((U, U), U)>}
+
+\mintinline{rust}{  where T: Clone + Add<Output = T>,}
+
+\mintinline{rust}{        U: Clone + Add<Output = U>}
+
+\noindent
+Ne porabi seznamov — vzame nespremenljivi referenci. Za vsak par ustreznih elementov vrne nabor \mintinline{rust}{((a, b), a + b)} — torej par kloniranih vrednosti in njuno vsoto. Potrebujemo \mintinline{rust}{Clone}, ker elemente kloniramo iz referenc (za par in za vsoto), ter \mintinline{rust}{Add<Output = T>} za seštevanje. Rekurzivni klic deluje, ker rep tipa \mintinline{rust}{Izmenicni<U, T>} prav tako zadošča omejitvam (vlogi \mintinline{rust}{T} in \mintinline{rust}{U} se zamenjata).
+
+\bigskip
+\noindent
+\emph{Celotna rešitev:}
+\begin{minted}{rust}
+use std::ops::Add;
+
+enum Izmenicni<T, U> {
+    Prazen,
+    Sestavljen(T, Box<Izmenicni<U, T>>),
+}
+
+impl<T, U> Izmenicni<T, U> {
+    fn dolzina(&self) -> usize {
+        match self {
+            Izmenicni::Prazen => 0,
+            Izmenicni::Sestavljen(_, rep) => 1 + rep.dolzina(),
+        }
+    }
+
+    fn glava(&self) -> Option<&T> {
+        match self {
+            Izmenicni::Prazen => None,
+            Izmenicni::Sestavljen(glava, _) => Some(glava),
+        }
+    }
+
+    fn rep(self) -> Izmenicni<U, T> {
+        match self {
+            Izmenicni::Prazen => Izmenicni::Prazen,
+            Izmenicni::Sestavljen(_, rep) => *rep,
+        }
+    }
+
+    fn dodaj(self, x: U) -> Izmenicni<U, T> {
+        Izmenicni::Sestavljen(x, Box::new(self))
+    }
+
+    fn zamenjaj_glavo(&mut self, x: T) {
+        if let Izmenicni::Sestavljen(glava, _) = self {
+            *glava = x;
+        }
+    }
+
+    fn zdruzi_in_sestej(&self, other: &Izmenicni<T, U>)
+        -> Izmenicni<((T, T), T), ((U, U), U)>
+    where
+        T: Clone + Add<Output = T>,
+        U: Clone + Add<Output = U>,
+    {
+        match (self, other) {
+            (Izmenicni::Prazen, _) | (_, Izmenicni::Prazen) => Izmenicni::Prazen,
+            (Izmenicni::Sestavljen(t1, rep1), Izmenicni::Sestavljen(t2, rep2)) => {
+                let vsota = t1.clone() + t2.clone();
+                Izmenicni::Sestavljen(
+                    ((t1.clone(), t2.clone()), vsota),
+                    Box::new(rep1.zdruzi_in_sestej(rep2)),
+                )
+            }
+        }
+    }
+}
+\end{minted}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\naloga[\tocke{20}]
+Za vsakega izmed spodnjih programov:
+\begin{enumerate}
+  \item razložite, zakaj in s kakšnim namenom Rust program zavrne;
+  \item program popravite tako, da bo veljaven in bo učinkovito dosegel prvotni namen.
+\end{enumerate}
+
+\podnaloga
+\begin{minted}{rust}
+fn main() {
+    let besede = vec![String::from("jabolko"), String::from("hruška")];
+    let prva = besede[0];
+    println!("Prva beseda: {}", prva);
+}
+\end{minted}
+
+\noindent
+\emph{Rešitev:} Indeksiranje vektorja nizov z \mintinline{rust}{besede[0]} bi premaknilo lastništvo niza iz vektorja, kar pa Rust ne dovoli, saj bi vektor ostal v nedoločenem stanju. Pravilna rešitev je uporaba reference ali kloniranje:
+\begin{minted}{rust}
+fn main() {
+    let besede = vec![String::from("jabolko"), String::from("hruška")];
+    let prva = &besede[0];
+    println!("Prva beseda: {}", prva);
+}
+\end{minted}
+
+\podnaloga
+\begin{minted}{rust}
+struct Izpisek {
+    besedilo: &str,
+}
+fn main() {
+    let s = String::from("Pozdravljen svet");
+    let i = Izpisek { besedilo: &s };
+    println!("{}", i.besedilo);
+}
+\end{minted}
+
+\noindent
+\emph{Rešitev:} Struktura \mintinline{rust}{Izpisek} vsebuje referenco \mintinline{rust}{&str}, vendar nima življenjske dobe. Rust mora vedeti, da referenca v strukturi živi dovolj dolgo, zato moramo dodati življenjsko dobo:
+\begin{minted}{rust}
+struct Izpisek<'a> {
+    besedilo: &'a str,
+}
+\end{minted}
+
+\podnaloga
+\begin{minted}{rust}
+fn main() {
+    let mut v = vec![1, 2, 3];
+    let prvi = &v[0];
+    v.push(4);
+    println!("Prvi element: {}", prvi);
+}
+\end{minted}
+
+\noindent
+\emph{Rešitev:} Spremenljivka \mintinline{rust}{prvi} drži nespremenljivo referenco na element vektorja. Klic \mintinline{rust}{v.push(4)} zahteva spremenljivo referenco na \mintinline{rust}{v}, kar krši pravilo izposoje: ne smemo imeti hkrati spremenljive in nespremenljive reference. Poleg tega \mintinline{rust}{push} lahko povzroči realokacijo vektorja, kar bi naredilo referenco \mintinline{rust}{prvi} neveljavno. Rešitev je, da referenco uporabimo pred spremembo vektorja:
+\begin{minted}{rust}
+fn main() {
+    let mut v = vec![1, 2, 3];
+    let prvi = v[0];
+    v.push(4);
+    println!("Prvi element: {}", prvi);
+}
+\end{minted}
+
+\podnaloga
+\begin{minted}{rust}
+fn podvoji(v: &Vec<String>) -> Vec<String> {
+    let mut rezultat = Vec::new();
+    for s in v {
+        rezultat.push(*s);
+    }
+    rezultat
+}
+\end{minted}
+
+\noindent
+\emph{Rešitev:} Zanka \mintinline{rust}{for s in v} iterira po referencah \mintinline{rust}{&String} (ker je \mintinline{rust}{v} tipa \mintinline{rust}{&Vec<String>}). Izraz \mintinline{rust}{*s} poskuša premakniti (move) niz iz reference, kar Rust ne dovoli, saj nimamo lastništva nad elementi vektorja. Rešitev je kloniranje elementov:
+\begin{minted}{rust}
+fn podvoji(v: &Vec<String>) -> Vec<String> {
+    let mut rezultat = Vec::new();
+    for s in v {
+        rezultat.push(s.clone());
+    }
+    rezultat
+}
+\end{minted}
+
+\podnaloga
+\begin{minted}{rust}
+fn prvi_znak(s: &str) -> &str {
+    let rezultat = String::from(&s[..1]);
+    &rezultat
+}
+fn main() {
+    let s = String::from("Rust");
+    println!("{}", prvi_znak(&s));
+}
+\end{minted}
+
+\noindent
+\emph{Rešitev:} Funkcija ustvari lokalno spremenljivko \mintinline{rust}{rezultat} in vrne referenco nanjo. Ker se \mintinline{rust}{rezultat} sprosti ob koncu funkcije, bi referenca kazala na neveljavno (sproščeno) pomnilniško mesto — to je viseča referenca (dangling reference), ki jo Rust prepreči. Rešitev je, da namesto nove alokacije vrnemo rezino (slice) vhodnega niza, ki živi dovolj dolgo:
+\begin{minted}{rust}
+fn prvi_znak(s: &str) -> &str {
+    &s[..1]
+}
+\end{minted}
+
+
+\end{document}
