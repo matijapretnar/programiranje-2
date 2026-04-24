@@ -75,7 +75,7 @@ fn fn_is_too_restrictive() {
     // println!("{}", apply_int_impl(add_one, 10));
 }
 
-fn fn_is_too_restricitve2() {
+fn fn_is_too_restrictive2() {
     let s = String::from("Consumed");
     let mut dummy = vec![];
     let return_and_move = |x: i64| {
@@ -120,7 +120,7 @@ fn fn_is_too_restrictive_not_anymore() {
     // println!("{}", apply_int_once(add_one, 10)); // To ne gre več
 }
 
-fn fn_is_too_restricitve2_not_anymore() {
+fn fn_is_too_restrictive2_not_anymore() {
     let s = String::from("Consumed");
     let mut dummy = vec![];
     let return_and_move = |x: i64| {
@@ -154,41 +154,41 @@ fn fn_is_too_restrictive_not_anymore_box_problem() {
 
 // 2. Za poljuben T je to podobno
 
-fn apply_dyn<T>(f: &dyn Fn(T) -> T, x: T) -> T {
+fn apply_dyn<A, B>(f: &dyn Fn(A) -> B, x: A) -> B {
     return f(x);
 }
 
-fn apply_impl<T>(f: impl Fn(T) -> T, x: T) -> T {
+fn apply_impl<A, B>(f: impl Fn(A) -> B, x: A) -> B {
     return f(x);
 }
 
-fn apply<T, F>(f: F, x: T) -> T
+fn apply<A, B, F>(f: F, x: A) -> B
 where
-    F: Fn(T) -> T,
+    F: Fn(A) -> B,
 {
     return f(x);
 }
 
 // In še FnOnce
-fn apply_dynOnce(f: Box<dyn FnOnce(i64) -> i64>, x: i64) -> i64 {
+fn apply_dyn_once<A, B>(f: Box<dyn FnOnce(A) -> B>, x: A) -> B {
     return f(x);
 }
 
-fn apply_traitOnce<T>(f: impl FnOnce(T) -> T, x: T) -> T {
+fn apply_trait_once<A, B>(f: impl FnOnce(A) -> B, x: A) -> B {
     return f(x);
 }
 
 // 3. Za dva poljubna T je to podobno
 
-fn apply2_dyn<T>(f: &dyn Fn(T, T) -> T, x: T, y: T) -> T {
+fn apply2_dyn<A, B>(f: &dyn Fn(A, A) -> B, x: A, y: A) -> B {
     return f(x, y);
 }
 
-fn apply2_impl<T>(f: impl Fn(T, T) -> T, x: T, y: T) -> T {
+fn apply2_impl<A, B>(f: impl Fn(A, A) -> B, x: A, y: A) -> B {
     return f(x, y);
 }
 
-fn apply2_impl_borrow<T>(f: impl Fn(&T, &T) -> T, x: &T, y: &T) -> T {
+fn apply2_impl_borrow<A, B>(f: impl Fn(&A, &A) -> B, x: &A, y: &A) -> B {
     return f(x, y);
 }
 
@@ -250,6 +250,89 @@ fn ponavljaj<T>(n: i32, mut f: impl FnMut(T) -> T, x: T) -> T {
 //     return result;
 // }
 
+// 6. filter: ('a -> bool) -> 'a list -> 'a list
+// Vrne nov seznam elementov, ki zadoščajo pogoju f.
+// Uporabimo FnMut (ne Fn), saj je bolj splošen - FnMut dovoli zaprtja, ki spreminjajo svoje okolje
+// (npr. štetje koliko elementov je bilo odfiltrirano), Fn pa ne.
+// Uporabimo into_iter(), ki prevzame lastništvo nad elementi - zato filter vrne T (ne &T)
+// in nam ni treba klonirati ali kopirati.
+fn filter<T>(f: impl FnMut(&T) -> bool, list: Vec<T>) -> Vec<T> {
+    return list.into_iter().filter(f).collect();
+}
+
+// Alternativa: če ne želimo porabiti originalnega vektorja, vzamemo referenco
+// .iter() vrne &T, .filter() pa vzame &&T (referenca na referenco)
+fn filter_ref<T>(mut f: impl FnMut(&&T) -> bool, list: &Vec<T>) -> Vec<&T> {
+    return list.iter().filter(|x| f(x)).collect();
+}
+
+// -------------------------------------------------------------------------------------------------
+// Vzemite zaporedja iz prejšnjih vaj in naredite nov objekt, ki sprejme zaporedje in ga naredi iterabilnega
+//
+// Iz 06-polimorfizem imamo trait Zaporedje<T> z metodo k_th(k) -> T.
+// Želimo ga oviti v Rustov Iterator trait, da dobimo dostop do map, filter, take, sum, collect itd.
+//
+// Ideja: naredimo strukturo ZaporedjeIter, ki hrani referenco na zaporedje in trenutni indeks.
+// Ob vsakem klicu next() vrne k-ti člen in poveča indeks.
+// Ker so matematična zaporedja neskončna, next() vedno vrne Some(...).
+
+// Predpostavimo, da imamo trait Zaporedje<T> iz 06-polimorfizem:
+// pub trait Zaporedje<T> {
+//     fn name(&self) -> &str;
+//     fn start(&self) -> T;
+//     fn k_th(&self, k: u64) -> T;
+//     fn contains(&self, value: &T) -> bool;
+// }
+
+// Ovijemo zaporedje v iterator
+// 'a - življenjska doba reference na zaporedje (iter ne sme preživeti zaporedja)
+// PhantomData<T> - potrebujemo, ker T nastopa samo v trait boundu, ne kot polje
+struct ZaporedjeIter<'a, T, Z: Zaporedje<T>> {
+    zaporedje: &'a Z,
+    index: u64,
+    _marker: std::marker::PhantomData<T>,
+}
+
+impl<'a, T, Z: Zaporedje<T>> ZaporedjeIter<'a, T, Z> {
+    fn new(zaporedje: &'a Z) -> Self {
+        ZaporedjeIter {
+            zaporedje,
+            index: 1, // Zaporedja iz 06 so 1-indeksirana (k_th(1) = prvi člen)
+            _marker: std::marker::PhantomData,
+        }
+    }
+}
+
+// Ko implementiramo Iterator, dobimo brezplačno vse kombinator metode:
+// .take(n), .map(...), .filter(...), .sum(), .collect(), .zip(...), itd.
+impl<'a, T, Z: Zaporedje<T>> Iterator for ZaporedjeIter<'a, T, Z> {
+    type Item = T;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        let value = self.zaporedje.k_th(self.index);
+        self.index += 1;
+        Some(value) // Zaporedje je neskončno, vedno vrne Some
+    }
+}
+
+// Primer uporabe (če bi imeli dostop do zaporedij iz 06):
+// let fib = FibonacciZaporedje::new("fib", 0i64, 1);
+// let prvih_10: Vec<i64> = ZaporedjeIter::new(&fib).take(10).collect();
+// // [0, 1, 1, 2, 3, 5, 8, 13, 21, 34]
+//
+// let arit = AritmeticnoZaporedje::new("naravna", 1i64, 1);
+// let vsota: i64 = ZaporedjeIter::new(&arit).take(100).sum();
+// // 1 + 2 + ... + 100 = 5050
+//
+// POZOR: ker je zaporedje neskončno, moramo vedno uporabiti .take(n) ali podobno,
+// sicer se zanka ne ustavi (npr. .collect() brez take bi tekel v neskončnost).
+
+// Uvozimo trait in konkretna zaporedja iz 06-polimorfizem:
+use vaje_06::zaporedje::{
+    AritmeticnoZaporedje, FibonacciZaporedje, GeometrijskoZaporedje, KonstantnoZaporedje,
+    Zaporedje,
+};
+
 fn main() {
     // use_dynamic();
     // use_impl();
@@ -263,6 +346,37 @@ fn main() {
         return s + "."; // Just return the same reference (no modification)
     };
     println!("{}", ponavljaj(10, add_dot, s));
+
+    // ----- ZaporedjeIter primeri -----
+
+    // Fibonacci: 0, 1, 1, 2, 3, 5, 8, 13, 21, 34, ...
+    let fib = FibonacciZaporedje::new("fib", 0i64, 1);
+    let prvih_10: Vec<i64> = ZaporedjeIter::new(&fib).take(10).collect();
+    println!("Fibonacci prvih 10: {:?}", prvih_10);
+
+    // Aritmetično: 1, 2, 3, 4, ...
+    let naravna = AritmeticnoZaporedje::new("naravna", 1i64, 1);
+    let vsota: i64 = ZaporedjeIter::new(&naravna).take(100).sum();
+    println!("Vsota 1..100 = {}", vsota); // 5050
+
+    // Geometrijsko: 1, 2, 4, 8, 16, ...
+    let geo = GeometrijskoZaporedje::new("potence2", 1i64, 2);
+    let potence: Vec<i64> = ZaporedjeIter::new(&geo).take(10).collect();
+    println!("Potence 2: {:?}", potence);
+
+    // Konstantno: 42, 42, 42, ...
+    let konst = KonstantnoZaporedje::new("konstanta", 42i64);
+    let vsi_42: Vec<i64> = ZaporedjeIter::new(&konst).take(5).collect();
+    println!("Konstantno: {:?}", vsi_42);
+
+    // Kombinacija z iteratorskimi metodami:
+    // Vzemi prvih 20 fibonaccijevih, obdrži samo sode, kvadriraj
+    let result: Vec<i64> = ZaporedjeIter::new(&fib)
+        .take(20)
+        .filter(|x| x % 2 == 0)
+        .map(|x| x * x)
+        .collect();
+    println!("Fibonacci sodi^2: {:?}", result);
 }
 
 // Iteratorji
@@ -302,7 +416,7 @@ fn sum_positive_products2(v1: Vec<i32>, v2: Vec<i32>) -> i32 {
     return sum_positive_products(v1.iter().zip(v2.iter()).map(|(a, b)| (*a, *b)).collect());
 }
 
-use std::fmt::{format, Display};
+use std::fmt::Display;
 
 fn print_options<T: Display>(v: Vec<Option<T>>) {
     v.iter().for_each(|x| match x {
@@ -318,7 +432,7 @@ fn count_options<T>(v: Vec<Option<T>>) -> i32 {
 fn filter_out_divisible_by_3(v: Vec<i64>) -> Vec<i64> {
     return v
         .iter()
-        .filter(|&&x| x % 3 == 0) // Fuj, ker imamo referenco, leše bi bilo z into_iter
+        .filter(|&&x| x % 3 == 0) // Fuj, ker imamo referenco, lepše bi bilo z into_iter
         .map(|x| {
             return *x;
         })
@@ -326,7 +440,7 @@ fn filter_out_divisible_by_3(v: Vec<i64>) -> Vec<i64> {
 }
 
 // Dopolnite spodnjo funkcijo, da vrne niz, kjer so vse prve črke posameznih besed velike
-// ["Just,", " ", "hello", " ", "world", "!"] -> "Just, Hello World", "!"
+// ["Just,", " ", "hello", " ", "world", "!"] -> "Just, Hello World!"
 pub fn capitalize_words_string(words: &[&str]) -> String {
     return words
         .iter()
