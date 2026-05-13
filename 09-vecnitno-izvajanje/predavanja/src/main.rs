@@ -37,9 +37,10 @@ fn vzporedne_niti_ki_ustrezno_pocakamo() {
     let mut hs = vec![];
     for i in 1..5000 {
         let h = thread::spawn(move || print_pro_tip(i));
-        hs.push(h);
+        hs.push((i, h));
     }
-    for h in hs {
+    for (i, h) in hs {
+        println!("Čakam na pro tip #{i}");
         h.join();
     }
 }
@@ -54,8 +55,9 @@ fn send_pro_tip(i: i32, tx: mpsc::Sender<String>) {
 fn vzporedne_niti_ki_komunicirajo_s_klicateljem() {
     let mut hs = vec![];
     let (tx, rx) = mpsc::channel();
-    for i in 1..5000 {
+    for i in 1..10000 {
         let tx_clone = tx.clone();
+        println!("Poganjam {i}-to nit");
         let h = thread::spawn(move || send_pro_tip(i, tx_clone));
         hs.push(h);
     }
@@ -65,9 +67,9 @@ fn vzporedne_niti_ki_komunicirajo_s_klicateljem() {
 }
 
 fn main() {
-    pocasno_zaporedno_izvajanje();
-    vzporedne_niti_ki_jih_prehitro_opustimo();
-    vzporedne_niti_ki_jih_sproti_cakamo();
-    vzporedne_niti_ki_ustrezno_pocakamo();
+    // pocasno_zaporedno_izvajanje();
+    // vzporedne_niti_ki_jih_prehitro_opustimo();
+    // vzporedne_niti_ki_jih_sproti_cakamo();
+    // vzporedne_niti_ki_ustrezno_pocakamo();
     vzporedne_niti_ki_komunicirajo_s_klicateljem();
 }
